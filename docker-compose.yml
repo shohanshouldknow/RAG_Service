@@ -1,0 +1,22 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      EMBEDDING_MODEL: "${EMBEDDING_MODEL:-sentence-transformers/all-MiniLM-L6-v2}"
+      LLM_MODEL: "${LLM_MODEL:-qwen2.5:3b}"
+      OLLAMA_BASE_URL: "${OLLAMA_BASE_URL:-http://host.docker.internal:11434}"
+      CHROMA_PATH: "/app/storage/chroma"
+      CHROMA_COLLECTION: "${CHROMA_COLLECTION:-docusense}"
+      TOP_K: "${TOP_K:-4}"
+      MIN_SIMILARITY: "${MIN_SIMILARITY:-0.52}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - chroma_data:/app/storage/chroma
+      - huggingface_cache:/home/docusense/.cache/huggingface
+
+volumes:
+  chroma_data:
+  huggingface_cache:

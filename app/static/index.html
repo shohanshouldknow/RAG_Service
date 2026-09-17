@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="Upload a document and ask grounded questions with DocuSense."
+    >
+    <title>DocuSense — Grounded Document Q&amp;A</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23172220'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-size='23' font-family='Georgia' font-style='italic' fill='%23fbfaf6'%3ED%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#question-heading">Skip to question workspace</a>
+
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="DocuSense home">
+        <span class="brand-mark" aria-hidden="true">D</span>
+        <span>
+          <strong>DocuSense</strong>
+          <small>Grounded Document Q&amp;A</small>
+        </span>
+      </a>
+
+      <div class="header-actions">
+        <a
+          class="creator-link"
+          href="https://kshohan.vercel.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Visit Kamruzzaman Shohan's portfolio"
+        >
+          <span class="creator-copy">
+            <small>Designed &amp; built by</small>
+            <strong>Kamruzzaman Shohan</strong>
+          </span>
+          <span class="creator-arrow" aria-hidden="true">↗</span>
+        </a>
+
+        <div class="document-status" id="documentStatus" data-state="empty" role="status">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="documentStatusText">No document indexed</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">Evidence-first question answering</p>
+        <h1 id="page-title">Grounded answers,<br><em>with the receipts.</em></h1>
+        <p class="intro-copy">
+          Index one policy document, ask a focused question, and inspect the
+          exact passages that supported the answer.
+        </p>
+      </section>
+
+      <div class="workspace">
+        <aside class="document-panel" aria-labelledby="document-heading">
+          <div class="section-number" aria-hidden="true">01</div>
+          <div class="panel-heading">
+            <p class="eyebrow">Active corpus</p>
+            <h2 id="document-heading">Add a document</h2>
+            <p>Markdown or plain text, up to 5 MB.</p>
+          </div>
+
+          <form id="uploadForm" novalidate>
+            <div
+              class="drop-zone"
+              id="dropZone"
+              aria-describedby="uploadHint"
+            >
+              <input
+                class="visually-hidden"
+                id="documentFile"
+                name="file"
+                type="file"
+                accept=".md,.txt,text/markdown,text/plain"
+                tabindex="-1"
+                aria-hidden="true"
+              >
+              <span class="upload-glyph" aria-hidden="true">
+                <svg viewBox="0 0 32 32" focusable="false">
+                  <path d="M16 22V7m0 0-6 6m6-6 6 6M6 22v3h20v-3" />
+                </svg>
+              </span>
+              <strong>Drop your document here</strong>
+              <span>or</span>
+              <button class="text-button" id="browseButton" type="button">
+                Browse files
+              </button>
+              <small id="uploadHint">Accepted: .md and .txt</small>
+            </div>
+
+            <div class="selected-file" id="selectedFile" hidden>
+              <span class="file-type" id="fileType" aria-hidden="true">MD</span>
+              <span class="file-details">
+                <strong id="selectedFileName"></strong>
+                <small id="selectedFileSize"></small>
+              </span>
+              <button class="icon-button" id="removeFileButton" type="button" aria-label="Remove selected file">
+                ×
+              </button>
+            </div>
+
+            <button class="primary-button full-width" id="uploadButton" type="submit" disabled>
+              <span class="button-label">Upload &amp; index</span>
+              <span class="button-loader" aria-hidden="true"></span>
+            </button>
+
+            <p class="form-message" id="uploadMessage" aria-live="polite"></p>
+          </form>
+
+          <div class="replace-note">
+            <span aria-hidden="true">↻</span>
+            <p>Uploading a new document replaces the currently indexed document.</p>
+          </div>
+
+          <dl class="index-summary" id="indexSummary" hidden>
+            <div>
+              <dt>Document</dt>
+              <dd id="indexedFilename"></dd>
+            </div>
+            <div>
+              <dt>Chunks indexed</dt>
+              <dd id="indexedChunkCount"></dd>
+            </div>
+          </dl>
+        </aside>
+
+        <section class="query-panel" aria-labelledby="question-heading">
+          <div class="section-number" aria-hidden="true">02</div>
+          <div class="panel-heading query-heading">
+            <div>
+              <p class="eyebrow">Query workspace</p>
+              <h2 id="question-heading">Ask the active document</h2>
+            </div>
+            <span class="grounded-label">Similarity gated</span>
+          </div>
+
+          <form id="questionForm">
+            <label for="questionInput">Your question</label>
+            <div class="question-field">
+              <textarea
+                id="questionInput"
+                name="question"
+                rows="4"
+                maxlength="2000"
+                placeholder="Upload a document to begin…"
+                disabled
+                required
+              ></textarea>
+              <div class="question-actions">
+                <span class="keyboard-hint">Ctrl / ⌘ + Enter</span>
+                <button class="primary-button ask-button" id="askButton" type="submit" disabled>
+                  <span class="button-label">Ask DocuSense</span>
+                  <span class="button-loader" aria-hidden="true"></span>
+                </button>
+              </div>
+            </div>
+            <p class="form-message" id="queryMessage" aria-live="polite"></p>
+          </form>
+
+          <div class="empty-answer" id="emptyAnswer">
+            <div class="empty-rule" aria-hidden="true"></div>
+            <p>Your grounded answer will appear here.</p>
+            <span>Supporting evidence stays visible and inspectable.</span>
+          </div>
+
+          <article class="answer-panel" id="answerPanel" hidden aria-live="polite">
+            <header class="answer-header">
+              <div>
+                <p class="answer-state" id="answerState"></p>
+                <h3 id="answerTitle">Answer</h3>
+              </div>
+              <dl class="answer-metrics">
+                <div>
+                  <dt>Sources</dt>
+                  <dd id="sourceCount">0</dd>
+                </div>
+                <div>
+                  <dt>Tokens</dt>
+                  <dd id="tokenCount">0</dd>
+                </div>
+              </dl>
+            </header>
+
+            <p class="answer-text" id="answerText"></p>
+
+            <section class="sources-section" id="sourcesSection" aria-labelledby="sourcesHeading">
+              <div class="sources-heading">
+                <h4 id="sourcesHeading">Supporting evidence</h4>
+                <span>Qualifying chunks supplied to the model</span>
+              </div>
+              <div class="source-list" id="sourceList"></div>
+            </section>
+          </article>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <span>Local inference · No paid API key</span>
+      <span>MiniLM · Chroma · Qwen</span>
+    </footer>
+  </body>
+</html>
